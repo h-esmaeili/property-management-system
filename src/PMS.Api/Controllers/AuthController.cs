@@ -27,19 +27,12 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var userId = await _sender.Send(
-                new RegisterUserCommand(request.Email, request.Password, request.OrganizationName),
-                cancellationToken);
-            _logger.LogInformation("Registration succeeded for user {UserId}", userId);
-            return Created($"/api/v1/users/{userId}", new { id = userId });
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning(ex, "Registration rejected: {Reason}", ex.Message);
-            return BadRequest(new { error = ex.Message });
-        }
+        var userId = await _sender.Send(
+            new RegisterUserCommand(request.Email, request.Password, request.OrganizationName),
+            cancellationToken);
+        _logger.LogInformation("Registration succeeded for user {UserId}", userId);
+        
+        return Created($"/api/v1/users/{userId}", new { id = userId });
     }
 
     /// <summary>Authenticate and receive a JWT for subsequent requests.</summary>
@@ -48,19 +41,12 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _sender.Send(new LoginCommand(request.Email, request.Password), cancellationToken);
-            _logger.LogInformation(
-                "Login succeeded for user {UserId} in tenant {TenantId}",
-                result.UserId,
-                result.TenantId);
-            return Ok(result);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogWarning(ex, "Login failed (invalid credentials)");
-            return Unauthorized();
-        }
+        var result = await _sender.Send(new LoginCommand(request.Email, request.Password), cancellationToken);
+        _logger.LogInformation(
+            "Login succeeded for user {UserId} in tenant {TenantId}",
+            result.UserId,
+            result.TenantId);
+        
+        return Ok(result);
     }
 }

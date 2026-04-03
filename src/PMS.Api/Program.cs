@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PMS.Api;
 using PMS.Api.Logging;
+using PMS.Api.Middleware;
 using PMS.Api.Swagger;
 using PMS.Application;
 using PMS.Application.Common.Interfaces;
@@ -70,6 +71,7 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+app.UseExceptionHandling();
 app.UseHttpsRedirection();
 app.UsePmsSerilogRequestLogging();
 app.UseAuthentication();
