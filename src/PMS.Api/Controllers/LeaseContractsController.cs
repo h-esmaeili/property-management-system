@@ -6,6 +6,7 @@ using PMS.Api.Models.LeaseContracts;
 
 namespace PMS.Api.Controllers;
 
+/// <summary>Create and manage lease contracts for the current tenant (JWT required).</summary>
 [ApiController]
 [Route("api/v1/lease-contracts")]
 [Authorize]
@@ -19,6 +20,7 @@ public sealed class LeaseContractsController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create a lease contract and publish an integration event.</summary>
     [HttpPost]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateLeaseContractRequest request, CancellationToken cancellationToken)

@@ -8,6 +8,7 @@ using PMS.Api.Models.Webhooks;
 
 namespace PMS.Api.Controllers;
 
+/// <summary>Manage outbound webhook subscriptions for the current user (JWT required).</summary>
 [ApiController]
 [Route("api/v1/webhook-subscriptions")]
 [Authorize]
