@@ -15,6 +15,7 @@ public sealed class AppDbContext : DbContext, IUnitOfWork
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<Role> Roles => Set<Role>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LeaseContract> LeaseContracts => Set<LeaseContract>();
     public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();

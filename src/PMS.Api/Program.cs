@@ -45,7 +45,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSection.Issuer,
             ValidAudience = jwtSection.Audience,
             IssuerSigningKey = signingKey,
-            NameClaimType = ClaimTypes.NameIdentifier
+            NameClaimType = ClaimTypes.NameIdentifier,
+            RoleClaimType = ClaimTypes.Role
         };
     });
 

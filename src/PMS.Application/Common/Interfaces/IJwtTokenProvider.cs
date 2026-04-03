@@ -6,5 +6,5 @@ public sealed record JwtTokenResult(string AccessToken, DateTime ExpiresAtUtc);
 
 public interface IJwtTokenProvider
 {
-    JwtTokenResult CreateToken(User user, CancellationToken cancellationToken = default);
+    JwtTokenResult CreateToken(User user, string roleName, CancellationToken cancellationToken = default);
 }

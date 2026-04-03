@@ -22,6 +22,7 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("Database")));
 
         services.AddScoped<ITenantRepository, TenantRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ILeaseContractRepository, LeaseContractRepository>();
         services.AddScoped<IWebhookSubscriptionRepository, WebhookSubscriptionRepository>();

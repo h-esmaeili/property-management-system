@@ -14,6 +14,10 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Email).HasMaxLength(256).IsRequired();
         builder.HasIndex(x => x.Email).IsUnique();
         builder.Property(x => x.PasswordHash).HasMaxLength(1024).IsRequired();
+        builder.HasOne(x => x.Role)
+            .WithMany()
+            .HasForeignKey(x => x.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Tenant>()
             .WithMany()
             .HasForeignKey(x => x.TenantId)

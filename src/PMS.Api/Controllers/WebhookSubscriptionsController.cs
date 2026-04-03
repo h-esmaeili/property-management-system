@@ -5,13 +5,14 @@ using PMS.Application.Common.IntegrationEvents;
 using PMS.Application.Webhooks.Commands.CreateWebhookSubscription;
 using PMS.Application.Webhooks.Queries.GetMyWebhookSubscriptions;
 using PMS.Api.Models.Webhooks;
+using PMS.Domain.Users;
 
 namespace PMS.Api.Controllers;
 
 /// <summary>Manage outbound webhook subscriptions for the current user (JWT required).</summary>
 [ApiController]
 [Route("api/v1/webhook-subscriptions")]
-[Authorize]
+[Authorize(Roles = RoleNames.Admin + "," + RoleNames.Owner)]
 [Tags("Webhooks")]
 public sealed class WebhookSubscriptionsController : ControllerBase
 {

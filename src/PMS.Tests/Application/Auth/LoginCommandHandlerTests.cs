@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using PMS.Application.Auth.Commands.Login;
+using PMS.Application.Common;
 using PMS.Application.Common.Interfaces;
 using PMS.Domain.Users;
 
@@ -32,12 +33,12 @@ public sealed class LoginCommandHandlerTests
     [Fact]
     public async Task Handle_when_password_invalid_throws()
     {
-        var user = User.Create(Guid.NewGuid(), "a@b.com");
+        var user = User.Create(Guid.NewGuid(), "a@b.com", Guid.NewGuid());
         user.SetPasswordHash("stored");
 
         var users = new Mock<IUserRepository>();
-        users.Setup(u => u.GetByEmailAsync("a@b.com", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
+        users.Setup(u => u.GetByEmailForAuthenticationAsync("a@b.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserForAuthentication(user, RoleNames.Owner));
 
         var hasher = new Mock<IPasswordHasher<User>>();
         hasher.Setup(h => h.VerifyHashedPassword(user, "stored", "wrong"))
@@ -58,12 +59,12 @@ public sealed class LoginCommandHandlerTests
     public async Task Handle_returns_token_and_ids_when_valid()
     {
         var tenantId = Guid.NewGuid();
-        var user = User.Create(tenantId, "a@b.com");
+        var user = User.Create(tenantId, "a@b.com", Guid.NewGuid());
         user.SetPasswordHash("stored");
 
         var users = new Mock<IUserRepository>();
-        users.Setup(u => u.GetByEmailAsync("a@b.com", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(user);
+        users.Setup(u => u.GetByEmailForAuthenticationAsync("a@b.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserForAuthentication(user, RoleNames.Owner));
 
         var hasher = new Mock<IPasswordHasher<User>>();
         hasher.Setup(h => h.VerifyHashedPassword(user, "stored", "good"))
@@ -71,7 +72,7 @@ public sealed class LoginCommandHandlerTests
 
         var expires = DateTime.UtcNow.AddHours(1);
         var jwt = new Mock<IJwtTokenProvider>();
-        jwt.Setup(j => j.CreateToken(user, It.IsAny<CancellationToken>()))
+        jwt.Setup(j => j.CreateToken(user, RoleNames.Owner, It.IsAny<CancellationToken>()))
             .Returns(new JwtTokenResult("token-123", expires));
 
         var handler = new LoginCommandHandler(users.Object, jwt.Object, hasher.Object);

@@ -17,8 +17,11 @@ public sealed class JwtTokenProvider : IJwtTokenProvider
         _settings = settings.Value;
     }
 
-    public JwtTokenResult CreateToken(User user, CancellationToken cancellationToken = default)
+    public JwtTokenResult CreateToken(User user, string roleName, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(roleName))
+            throw new ArgumentException("Role name is required.", nameof(roleName));
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expires = DateTime.UtcNow.AddHours(_settings.ExpiresHours);
@@ -27,7 +30,8 @@ public sealed class JwtTokenProvider : IJwtTokenProvider
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
-            new("tenant_id", user.TenantId.ToString())
+            new("tenant_id", user.TenantId.ToString()),
+            new(ClaimTypes.Role, roleName.Trim())
         };
 
         var token = new JwtSecurityToken(
