@@ -24,15 +24,16 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
     public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var email = request.Email.Trim().ToLowerInvariant();
-        var user = await _users.GetByEmailAsync(email, cancellationToken);
-        if (user is null)
+        var auth = await _users.GetByEmailForAuthenticationAsync(email, cancellationToken);
+        if (auth is null)
             throw new UnauthorizedAccessException("Invalid email or password.");
 
+        var user = auth.User;
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (result == PasswordVerificationResult.Failed)
             throw new UnauthorizedAccessException("Invalid email or password.");
 
-        var jwt = _jwt.CreateToken(user, cancellationToken);
+        var jwt = _jwt.CreateToken(user, auth.RoleName, cancellationToken);
         return new LoginResponseDto(jwt.AccessToken, jwt.ExpiresAtUtc, user.Id, user.TenantId);
     }
 }

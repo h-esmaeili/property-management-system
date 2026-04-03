@@ -9,10 +9,12 @@ public sealed class UserTests
     public void Create_with_valid_args_sets_tenant_id_and_normalized_email()
     {
         var tenantId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
 
-        var user = User.Create(tenantId, "  User@Example.COM  ");
+        var user = User.Create(tenantId, "  User@Example.COM  ", roleId);
 
         user.TenantId.Should().Be(tenantId);
+        user.RoleId.Should().Be(roleId);
         user.Email.Should().Be("user@example.com");
         user.PasswordHash.Should().BeEmpty();
         user.Id.Should().NotBeEmpty();
@@ -21,9 +23,17 @@ public sealed class UserTests
     [Fact]
     public void Create_with_empty_tenant_id_throws()
     {
-        var act = () => User.Create(Guid.Empty, "a@b.com");
+        var act = () => User.Create(Guid.Empty, "a@b.com", Guid.NewGuid());
 
         act.Should().Throw<ArgumentException>().WithParameterName("tenantId");
+    }
+
+    [Fact]
+    public void Create_with_empty_role_id_throws()
+    {
+        var act = () => User.Create(Guid.NewGuid(), "a@b.com", Guid.Empty);
+
+        act.Should().Throw<ArgumentException>().WithParameterName("roleId");
     }
 
     [Theory]
@@ -31,7 +41,7 @@ public sealed class UserTests
     [InlineData("   ")]
     public void Create_with_empty_email_throws(string email)
     {
-        var act = () => User.Create(Guid.NewGuid(), email);
+        var act = () => User.Create(Guid.NewGuid(), email, Guid.NewGuid());
 
         act.Should().Throw<ArgumentException>().WithParameterName("email");
     }
@@ -39,7 +49,7 @@ public sealed class UserTests
     [Fact]
     public void SetPasswordHash_with_valid_value_sets_hash()
     {
-        var user = User.Create(Guid.NewGuid(), "a@b.com");
+        var user = User.Create(Guid.NewGuid(), "a@b.com", Guid.NewGuid());
 
         user.SetPasswordHash("  hash  ");
 
@@ -51,7 +61,7 @@ public sealed class UserTests
     [InlineData("   ")]
     public void SetPasswordHash_with_empty_throws(string hash)
     {
-        var user = User.Create(Guid.NewGuid(), "a@b.com");
+        var user = User.Create(Guid.NewGuid(), "a@b.com", Guid.NewGuid());
 
         var act = () => user.SetPasswordHash(hash);
 
