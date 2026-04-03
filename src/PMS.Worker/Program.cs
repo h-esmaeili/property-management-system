@@ -8,7 +8,6 @@ builder.Services.AddSerilog((services, loggerConfiguration) =>
 {
     loggerConfiguration
         .ReadFrom.Configuration(builder.Configuration)
-        .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "PMS.Worker");
 });
 

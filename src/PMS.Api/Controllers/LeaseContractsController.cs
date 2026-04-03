@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,25 +15,52 @@ namespace PMS.Api.Controllers;
 public sealed class LeaseContractsController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly ILogger<LeaseContractsController> _logger;
 
-    public LeaseContractsController(ISender sender)
+    public LeaseContractsController(ISender sender, ILogger<LeaseContractsController> logger)
     {
         _sender = sender;
+        _logger = logger;
     }
 
     /// <summary>Create a lease contract and publish an integration event.</summary>
     [HttpPost]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateLeaseContractRequest request, CancellationToken cancellationToken)
     {
-        var id = await _sender.Send(
-            new CreateLeaseContractCommand(
-                request.Title,
-                request.StartDate,
-                request.EndDate,
-                request.MonthlyRent,
-                request.Currency ?? "USD"),
-            cancellationToken);
-        return Created($"/api/v1/lease-contracts/{id}", new { id });
+        try
+        {
+            var id = await _sender.Send(
+                new CreateLeaseContractCommand(
+                    request.Title,
+                    request.StartDate,
+                    request.EndDate,
+                    request.MonthlyRent,
+                    request.Currency ?? "USD"),
+                cancellationToken);
+
+            Guid? tenantId = null;
+            if (Guid.TryParse(User.FindFirstValue("tenant_id"), out var tid))
+                tenantId = tid;
+
+            _logger.LogInformation(
+                "Created lease contract {LeaseContractId} for tenant {TenantId}",
+                id,
+                tenantId);
+
+            return Created($"/api/v1/lease-contracts/{id}", new { id });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning(ex, "Create lease contract denied: tenant context required");
+            return Unauthorized();
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Create lease contract rejected: {Reason}", ex.Message);
+            return BadRequest(new { error = ex.Message });
+        }
     }
 }

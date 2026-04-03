@@ -110,7 +110,7 @@ Tests live in `src/PMS.Tests` (xUnit, Moq, FluentAssertions). Run `dotnet test` 
 | JWT | `Jwt` section in `PMS.Api` |
 | RabbitMQ | `RabbitMq` in API (publisher) and Worker (consumer) — **exchange name must match** (`ExchangeName`, default `pms.integration`) |
 | Webhook retries | `WebhookDelivery` in `PMS.Worker` (`MaxAttempts`, delays, jitter) |
-| Logging (Serilog) | `Serilog` in both hosts — console + rolling files under `logs/` (`pms-api-*.log`, `pms-worker-*.log`); tune `MinimumLevel` and overrides per namespace |
+| Logging (Serilog) | `Serilog` in both hosts — enrichers (`MachineName`, `EnvironmentName`, `ProcessId`), rolling files under `logs/` (`pms-api-*.log`, `pms-worker-*.log`, `shared` writes). **Production** uses **Compact JSON** on console and file for log aggregation; **Development** uses readable text templates. API HTTP logs include `RequestId`, and `UserId` / `TenantId` when authenticated. |
 
 ## Documentation
 

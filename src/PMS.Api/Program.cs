@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PMS.Api;
+using PMS.Api.Logging;
 using PMS.Api.Swagger;
 using PMS.Application;
 using PMS.Application.Common.Interfaces;
@@ -18,7 +19,6 @@ builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration
         .ReadFrom.Configuration(context.Configuration)
-        .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "PMS.Api");
 });
 
@@ -71,7 +71,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseSerilogRequestLogging();
+app.UsePmsSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
