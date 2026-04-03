@@ -13,10 +13,12 @@ namespace PMS.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ISender sender)
+    public AuthController(ISender sender, ILogger<AuthController> logger)
     {
         _sender = sender;
+        _logger = logger;
     }
 
     /// <summary>Create an organization and the first user.</summary>
@@ -30,10 +32,12 @@ public sealed class AuthController : ControllerBase
             var userId = await _sender.Send(
                 new RegisterUserCommand(request.Email, request.Password, request.OrganizationName),
                 cancellationToken);
+            _logger.LogInformation("Registration succeeded for user {UserId}", userId);
             return Created($"/api/v1/users/{userId}", new { id = userId });
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(ex, "Registration rejected: {Reason}", ex.Message);
             return BadRequest(new { error = ex.Message });
         }
     }
@@ -47,10 +51,15 @@ public sealed class AuthController : ControllerBase
         try
         {
             var result = await _sender.Send(new LoginCommand(request.Email, request.Password), cancellationToken);
+            _logger.LogInformation(
+                "Login succeeded for user {UserId} in tenant {TenantId}",
+                result.UserId,
+                result.TenantId);
             return Ok(result);
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
+            _logger.LogWarning(ex, "Login failed (invalid credentials)");
             return Unauthorized();
         }
     }
