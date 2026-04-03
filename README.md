@@ -22,6 +22,8 @@ Scalable property management backend with lease contracts, JWT authentication, p
 | `docker-compose.yml` | PostgreSQL, RabbitMQ, and **PMS.Api** (HTTP `8080`) |
 | `Dockerfile` | Multi-stage build for `PMS.Api` |
 
+**Git branches:** `develop` is used for ongoing development; `main` reflects production.
+
 ## Quick start
 
 ### 1. Start infrastructure (and optional API in Docker)
@@ -99,6 +101,8 @@ The worker should POST the integration event to the registered URL(s).
 dotnet build PMS.slnx
 dotnet test PMS.slnx
 ```
+
+**CI:** On every push and pull request targeting **`develop`** (development) or **`main`** (production), [GitHub Actions](.github/workflows/ci.yml) restores, **builds the full solution** (Release, including `PMS.Api` and `PMS.Worker`), and runs **unit tests**.
 
 Tests live in `src/PMS.Tests` (xUnit, Moq, FluentAssertions). Run `dotnet test` from the repo root or pass `--filter FullyQualifiedName~PMS.Tests` to scope runs.
 
