@@ -100,6 +100,7 @@ dotnet build PMS.slnx
 | JWT | `Jwt` section in `PMS.Api` |
 | RabbitMQ | `RabbitMq` in API (publisher) and Worker (consumer) — **exchange name must match** (`ExchangeName`, default `pms.integration`) |
 | Webhook retries | `WebhookDelivery` in `PMS.Worker` (`MaxAttempts`, delays, jitter) |
+| Logging (Serilog) | `Serilog` in both hosts — console + rolling files under `logs/` (`pms-api-*.log`, `pms-worker-*.log`); tune `MinimumLevel` and overrides per namespace |
 
 ## Documentation
 
