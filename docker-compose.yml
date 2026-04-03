@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pms
+    ports:
+      - "5432:5432"
+    volumes:
+      - pms_pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - pms_rabbitmq:/var/lib/rabbitmq
+
+volumes:
+  pms_pgdata:
+  pms_rabbitmq:
