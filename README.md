@@ -19,11 +19,12 @@ Scalable property management backend with lease contracts, JWT authentication, p
 | `src/PMS.Worker` | RabbitMQ consumer → HTTP webhooks |
 | `src/PMS.Tests` | xUnit tests (domain + application) |
 | `docs/` | Requirements, design, PR notes |
-| `docker-compose.yml` | Local PostgreSQL + RabbitMQ (with management UI) |
+| `docker-compose.yml` | PostgreSQL, RabbitMQ, and **PMS.Api** (HTTP `8080`) |
+| `Dockerfile` | Multi-stage build for `PMS.Api` |
 
 ## Quick start
 
-### 1. Start infrastructure
+### 1. Start infrastructure (and optional API in Docker)
 
 From the repository root:
 
@@ -31,10 +32,15 @@ From the repository root:
 docker compose up -d
 ```
 
-This starts:
+This builds and starts **PMS.Api** together with:
 
 - **PostgreSQL** on port `5432` (user `postgres`, password `postgres`, database `pms`)
 - **RabbitMQ** on `5672` (AMQP) and **management UI** on [http://localhost:15672](http://localhost:15672) (default user/password: `guest` / `guest`)
+- **API** on [http://localhost:8080](http://localhost:8080) (HTTP inside the container; overrides in `docker-compose.yml` set `ConnectionStrings:Database` and `RabbitMq:HostName` for the Compose network)
+
+To build only the API image: `docker build -t pms-api .`
+
+To run **only Postgres + RabbitMQ** (e.g. local `dotnet run` for the API): `docker compose up -d postgres rabbitmq`.
 
 ### 2. Configure the API
 

@@ -9,6 +9,12 @@ services:
       - "5432:5432"
     volumes:
       - pms_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pms"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -17,6 +23,33 @@ services:
       - "15672:15672"
     volumes:
       - pms_rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Database: Host=postgres;Port=5432;Database=pms;Username=postgres;Password=postgres
+      RabbitMq__HostName: rabbitmq
+      Jwt__Issuer: PMS
+      Jwt__Audience: PMS
+      Jwt__Secret: CHANGE_ME_USE_LONG_SECRET_AT_LEAST_32_CHARS!!
+      Jwt__ExpiresHours: "24"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
 volumes:
   pms_pgdata:

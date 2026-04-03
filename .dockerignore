@@ -1,0 +1,12 @@
+**/.git
+**/.vs
+**/.idea
+**/bin
+**/obj
+**/TestResults
+**/logs
+**/*.user
+**/docs
+**/PMS.Tests
+**/*.md
+!README.md
