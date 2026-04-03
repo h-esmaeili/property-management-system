@@ -10,17 +10,20 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
 {
     private readonly ITenantRepository _tenants;
     private readonly IUserRepository _users;
+    private readonly IRoleRepository _roles;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher<User> _passwordHasher;
 
     public RegisterUserCommandHandler(
         ITenantRepository tenants,
         IUserRepository users,
+        IRoleRepository roles,
         IUnitOfWork unitOfWork,
         IPasswordHasher<User> passwordHasher)
     {
         _tenants = tenants;
         _users = users;
+        _roles = roles;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
     }
@@ -35,7 +38,11 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
         var tenant = Tenant.Create(request.OrganizationName);
         await _tenants.AddAsync(tenant, cancellationToken);
 
-        var user = User.Create(tenant.Id, email);
+        var ownerRoleId = await _roles.GetIdByNameAsync(RoleNames.Owner, cancellationToken);
+        if (ownerRoleId is null)
+            throw new InvalidOperationException("The Owner role is not configured.");
+
+        var user = User.Create(tenant.Id, email, ownerRoleId.Value);
         var hash = _passwordHasher.HashPassword(user, request.Password);
         user.SetPasswordHash(hash);
 

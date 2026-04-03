@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PMS.Application.LeaseContracts.Commands.CreateLeaseContract;
 using PMS.Api.Models.LeaseContracts;
+using PMS.Domain.Users;
 
 namespace PMS.Api.Controllers;
 
 /// <summary>Create and manage lease contracts for the current tenant (JWT required).</summary>
 [ApiController]
 [Route("api/v1/lease-contracts")]
-[Authorize]
+[Authorize(Roles = RoleNames.Admin + "," + RoleNames.Owner)]
 [Tags("Lease contracts")]
 public sealed class LeaseContractsController : ControllerBase
 {
