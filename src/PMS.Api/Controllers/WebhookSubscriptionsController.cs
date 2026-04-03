@@ -28,6 +28,7 @@ public sealed class WebhookSubscriptionsController : ControllerBase
     public async Task<IActionResult> List(CancellationToken cancellationToken)
     {
         var items = await _sender.Send(new GetMyWebhookSubscriptionsQuery(), cancellationToken);
+        
         return Ok(items);
     }
 
@@ -43,6 +44,7 @@ public sealed class WebhookSubscriptionsController : ControllerBase
         var id = await _sender.Send(
             new CreateWebhookSubscriptionCommand(body.Url, eventType, body.Secret),
             cancellationToken);
+        
         return Created($"/api/v1/webhook-subscriptions/{id}", new { id });
     }
 }

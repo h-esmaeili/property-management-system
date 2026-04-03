@@ -30,37 +30,24 @@ public sealed class LeaseContractsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateLeaseContractRequest request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var id = await _sender.Send(
-                new CreateLeaseContractCommand(
-                    request.Title,
-                    request.StartDate,
-                    request.EndDate,
-                    request.MonthlyRent,
-                    request.Currency ?? "USD"),
-                cancellationToken);
+        var id = await _sender.Send(
+            new CreateLeaseContractCommand(
+                request.Title,
+                request.StartDate,
+                request.EndDate,
+                request.MonthlyRent,
+                request.Currency ?? "USD"),
+            cancellationToken);
 
-            Guid? tenantId = null;
-            if (Guid.TryParse(User.FindFirstValue("tenant_id"), out var tid))
-                tenantId = tid;
+        Guid? tenantId = null;
+        if (Guid.TryParse(User.FindFirstValue("tenant_id"), out var tid))
+            tenantId = tid;
 
-            _logger.LogInformation(
-                "Created lease contract {LeaseContractId} for tenant {TenantId}",
-                id,
-                tenantId);
+        _logger.LogInformation(
+            "Created lease contract {LeaseContractId} for tenant {TenantId}",
+            id,
+            tenantId);
 
-            return Created($"/api/v1/lease-contracts/{id}", new { id });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            _logger.LogWarning(ex, "Create lease contract denied: tenant context required");
-            return Unauthorized();
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogWarning(ex, "Create lease contract rejected: {Reason}", ex.Message);
-            return BadRequest(new { error = ex.Message });
-        }
+        return Created($"/api/v1/lease-contracts/{id}", new { id });
     }
 }
