@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Use: dotnet test --settings src/PMS.Tests/PMS.Tests.runsettings --collect:"XPlat Code Coverage" -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Include>[PMS.Domain]*</Include>
+          <Exclude>[*.Tests]*</Exclude>
+        </Configuration>
+      </DataCollectors>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
