@@ -17,6 +17,7 @@ Scalable property management backend with lease contracts, JWT authentication, p
 | `src/PMS.Infrastructure` | EF Core (PostgreSQL), repositories, JWT, RabbitMQ publisher |
 | `src/PMS.Api` | HTTP API (controllers) |
 | `src/PMS.Worker` | RabbitMQ consumer → HTTP webhooks |
+| `src/PMS.Tests` | xUnit tests (domain + application) |
 | `docs/` | Requirements, design, PR notes |
 | `docker-compose.yml` | Local PostgreSQL + RabbitMQ (with management UI) |
 
@@ -90,7 +91,10 @@ The worker should POST the integration event to the registered URL(s).
 
 ```bash
 dotnet build PMS.slnx
+dotnet test PMS.slnx
 ```
+
+Tests live in `src/PMS.Tests` (xUnit, Moq, FluentAssertions). Run `dotnet test` from the repo root or pass `--filter FullyQualifiedName~PMS.Tests` to scope runs.
 
 ## Configuration reference
 
