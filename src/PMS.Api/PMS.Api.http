@@ -1,0 +1,49 @@
+@host = http://localhost:5005
+
+### Register (creates tenant + user)
+POST {{host}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "owner@example.com",
+  "password": "SecurePass1!",
+  "organizationName": "Acme Properties"
+}
+
+### Login
+# @name login
+POST {{host}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "owner@example.com",
+  "password": "SecurePass1!"
+}
+
+### List current user's webhook URLs (by event type)
+GET {{host}}/api/v1/webhook-subscriptions
+Authorization: Bearer {{token}}
+
+### Create webhook URL for an event (per user)
+POST {{host}}/api/v1/webhook-subscriptions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "url": "https://webhook.site/your-unique-id",
+  "eventType": "LeaseContractCreatedIntegrationEvent",
+  "secret": "optional-shared-secret"
+}
+
+### Create lease contract (Authorization: Bearer from login response)
+POST {{host}}/api/v1/lease-contracts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Unit 4B — Main Street",
+  "startDate": "2026-05-01",
+  "endDate": "2027-04-30",
+  "monthlyRent": 1850.00,
+  "currency": "USD"
+}
