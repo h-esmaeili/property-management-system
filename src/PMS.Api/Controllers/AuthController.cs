@@ -6,6 +6,7 @@ using PMS.Api.Models.Auth;
 
 namespace PMS.Api.Controllers;
 
+/// <summary>Register a user (creates tenant + account) and log in to obtain a JWT.</summary>
 [ApiController]
 [Route("api/v1/auth")]
 [Tags("Auth")]
@@ -18,6 +19,7 @@ public sealed class AuthController : ControllerBase
         _sender = sender;
     }
 
+    /// <summary>Create an organization and the first user.</summary>
     [HttpPost("register")]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -36,6 +38,7 @@ public sealed class AuthController : ControllerBase
         }
     }
 
+    /// <summary>Authenticate and receive a JWT for subsequent requests.</summary>
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
