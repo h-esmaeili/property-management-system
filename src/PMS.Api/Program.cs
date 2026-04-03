@@ -9,8 +9,17 @@ using PMS.Application.Common.Interfaces;
 using PMS.Infrastructure;
 using PMS.Infrastructure.Persistence;
 using PMS.Infrastructure.Security;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "PMS.Api");
+});
 
 builder.Services.AddControllers();
 builder.Services.AddApplication();
@@ -55,9 +64,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
+}

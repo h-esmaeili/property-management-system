@@ -384,6 +384,9 @@ MSBuild_Logs/
 # Visual Studio History (VSHistory) files
 .vshistory/
 
+# Serilog file sinks
+logs/
+
 # BeatPulse healthcheck temp database
 healthchecksdb
 
