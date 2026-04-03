@@ -19,17 +19,32 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
+        const int slowMs = 2000;
         var name = typeof(TRequest).Name;
-        _logger.LogDebug("MediatR begin {Request}", name);
         var sw = Stopwatch.StartNew();
         try
         {
-            return await next();
+            var response = await next();
+            sw.Stop();
+            if (sw.ElapsedMilliseconds >= slowMs)
+            {
+                _logger.LogWarning(
+                    "MediatR {Request} completed slowly in {ElapsedMs}ms",
+                    name,
+                    sw.ElapsedMilliseconds);
+            }
+            else
+            {
+                _logger.LogDebug("MediatR {Request} completed in {ElapsedMs}ms", name, sw.ElapsedMilliseconds);
+            }
+
+            return response;
         }
-        finally
+        catch (Exception ex)
         {
             sw.Stop();
-            _logger.LogDebug("MediatR end {Request} in {ElapsedMs}ms", name, sw.ElapsedMilliseconds);
+            _logger.LogError(ex, "MediatR {Request} failed after {ElapsedMs}ms", name, sw.ElapsedMilliseconds);
+            throw;
         }
     }
 }
