@@ -70,7 +70,7 @@ dotnet run --project src/PMS.Api/PMS.Api.csproj
 
 Default HTTP URL: **http://localhost:5005** (see `src/PMS.Api/Properties/launchSettings.json`).
 
-OpenAPI: in Development, OpenAPI is mapped; check your ASP.NET Core version for the exact endpoint (e.g. `/openapi/v1.json`).
+**Swagger UI** (Development only): [http://localhost:5005/swagger](http://localhost:5005/swagger) when running with `dotnet run`; with **Docker Compose**, use [http://localhost:8080/swagger](http://localhost:8080/swagger). OpenAPI JSON is at `/swagger/v1/swagger.json`. Click **Authorize**, set **Bearer**, and paste the JWT from `POST /api/v1/auth/login`.
 
 ### 5. Run the worker (webhook delivery)
 
